@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ROLE CARD</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Yu Gothic","Meiryo",sans-serif;
+}
+
+body{
+background:
+radial-gradient(circle at center,#1d2d50 0%,#0b1320 40%,#000 100%);
+overflow:hidden;
+height:100vh;
+}
+
+canvas{
+position:fixed;
+inset:0;
+z-index:0;
+}
+
+#overlay{
+position:relative;
+z-index:2;
+width:100%;
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+}
+
+#title{
+color:white;
+font-size:48px;
+letter-spacing:8px;
+margin-bottom:50px;
+text-shadow:
+0 0 10px cyan,
+0 0 30px cyan,
+0 0 60px cyan;
+}
+
+#openButton{
+
+padding:20px 60px;
+
+font-size:25px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+border:none;
+
+border-radius:50px;
+
+color:white;
+
+background:
+linear-gradient(45deg,#00c6ff,#0072ff);
+
+box-shadow:
+0 0 20px cyan,
+0 0 50px cyan;
+
+transition:.25s;
+
+}
+
+#openButton:hover{
+
+transform:scale(1.08);
+
+box-shadow:
+0 0 40px cyan,
+0 0 100px cyan;
+
+}
+
+#flash{
+
+position:fixed;
+
+inset:0;
+
+background:white;
+
+opacity:0;
+
+pointer-events:none;
+
+z-index:10;
+
+}
+
+#cardBox{
+
+display:none;
+
+margin-top:40px;
+
+animation:cardOpen 1.2s forwards;
+
+}
+
+#cardImage{
+
+width:340px;
+
+border-radius:18px;
+
+border:4px solid gold;
+
+box-shadow:
+0 0 20px gold,
+0 0 60px gold,
+0 0 130px gold;
+
+animation:goldGlow 2s infinite alternate;
+
+}
+
+#roleName{
+
+margin-top:25px;
+
+font-size:38px;
+
+font-weight:bold;
+
+color:white;
+
+text-align:center;
+
+letter-spacing:4px;
+
+text-shadow:
+0 0 15px gold,
+0 0 40px gold;
+
+}
+
+#magicCircle{
+
+position:fixed;
+
+width:420px;
+
+height:420px;
+
+border-radius:50%;
+
+display:none;
+
+border:2px solid rgba(0,255,255,.6);
+
+box-shadow:
+0 0 30px cyan,
+0 0 90px cyan;
+
+animation:
+spin 4s linear infinite,
+fadeMagic .8s ease;
+
+}
+
+#errorScreen{
+
+display:none;
+
+position:fixed;
+
+inset:0;
+
+background:black;
+
+z-index:20;
+
+justify-content:center;
+
+align-items:center;
+
+flex-direction:column;
+
+}
+
+.error{
+
+color:red;
+
+font-size:50px;
+
+font-weight:bold;
+
+letter-spacing:5px;
+
+text-shadow:
+0 0 20px red,
+0 0 50px red;
+
+margin:8px;
+
+animation:blink .12s infinite;
+
+}
+
+#trueRole{
+
+display:none;
+
+position:fixed;
+
+inset:0;
+
+z-index:30;
+
+justify-content:center;
+
+align-items:center;
+
+flex-direction:column;
+
+background:
+radial-gradient(circle,#550000,#150000,#000);
+
+}
+
+#trueCard{
+
+width:360px;
+
+border-radius:20px;
+
+border:4px solid crimson;
+
+box-shadow:
+0 0 40px red,
+0 0 120px crimson,
+0 0 220px darkred;
+
+animation:
+cardOpen 1s,
+goldGlow .8s infinite alternate;
+
+}
+
+#trueRoleName{
+
+margin-top:30px;
+
+font-size:45px;
+
+font-weight:bold;
+
+color:white;
+
+text-shadow:
+0 0 20px crimson,
+0 0 50px red;
+
+}
+
+@keyframes cardOpen{
+
+0%{
+
+opacity:0;
+
+transform:
+scale(.1)
+rotateY(180deg);
+
+}
+
+60%{
+
+transform:
+scale(1.15)
+rotateY(0deg);
+
+}
+
+100%{
+
+opacity:1;
+
+transform:scale(1);
+
+}
+
+}
+
+@keyframes goldGlow{
+
+from{
+
+filter:
+drop-shadow(0 0 5px gold);
+
+}
+
+to{
+
+filter:
+drop-shadow(0 0 30px gold);
+
+}
+
+}
+
+@keyframes spin{
+
+from{
+
+transform:rotate(0);
+
+}
+
+to{
+
+transform:rotate(360deg);
+
+}
+
+}
+
+@keyframes blink{
+
+50%{
+
+opacity:.2;
+
+}
+
+}
+
+@keyframes fadeMagic{
+
+from{
+
+opacity:0;
+
+transform:scale(.2);
+
+}
+
+to{
+
+opacity:1;
+
+transform:scale(1);
+
+}
+
+}
+
+.shake{
+
+animation:shake .08s infinite;
+
+}
+
+@keyframes shake{
+
+0%{transform:translate(5px,0);}
+25%{transform:translate(-5px,4px);}
+50%{transform:translate(5px,-4px);}
+75%{transform:translate(-4px,0);}
+100%{transform:translate(4px,4px);}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div id="flash"></div>
+
+<div id="overlay">
+
+<h1 id="title">
+ROLE CARD
+</h1>
+
+<button id="openButton">
+役職を受け取る
+</button>
+
+<div id="magicCircle"></div>
+
+<div id="cardBox">
+
+<img
+id="cardImage"
+src="2026-07-02 0.36.47.png"
+alt="Role Card">
+
+<div id="roleName">
+
+役職名：ささやく狂人
+
+</div>
+
+</div>
+
+<div id="errorScreen">
+
+<div class="error">
+
+██████████████
+
+</div>
+
+<div class="error">
+
+SYSTEM ERROR
+
+</div>
+
+<div class="error">
+
+██████████████
+
+</div>
+
+</div>
+
+<div id="trueRole">
+
+<img
+id="trueCard"
+src="IMG_3575.jpg">
+
+<div id="trueRoleName">
+
+役職名：賢狼
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+// ===== 星空 =====
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+
+function resize(){
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+}
+resize();
+addEventListener("resize",resize);
+
+let stars=[];
+
+for(let i=0;i<220;i++){
+    stars.push({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        r:Math.random()*2+1,
+        v:Math.random()*2+0.5
+    });
+}
+
+function draw(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle="white";
+
+    stars.forEach(s=>{
+
+        ctx.beginPath();
+        ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fill();
+
+        s.y-=s.v;
+
+        if(s.y<0){
+            s.y=canvas.height;
+            s.x=Math.random()*canvas.width;
+        }
+
+    });
+
+    requestAnimationFrame(draw);
+
+}
+
+draw();
+
+const button=document.getElementById("openButton");
+
+button.onclick=function(){
+
+    button.style.display="none";
+
+    document.getElementById("title").style.display="none";
+
+    // 魔法陣
+    const magic=document.getElementById("magicCircle");
+    magic.style.display="block";
+
+    // 白フラッシュ
+    document.getElementById("flash").animate([
+        {opacity:0},
+        {opacity:1},
+        {opacity:0}
+    ],{
+        duration:600
+    });
+
+    // 振動
+    if(navigator.vibrate){
+        navigator.vibrate([150,80,150]);
+    }
+
+    // カード表示
+    setTimeout(()=>{
+
+        magic.style.display="none";
+
+        document.getElementById("cardBox").style.display="block";
+
+    },1200);
+
+    // ===== 3秒後 =====
+
+    setTimeout(()=>{
+
+        document.body.classList.add("shake");
+
+        document.getElementById("cardBox").style.display="none";
+
+        const err=document.getElementById("errorScreen");
+
+        err.style.display="flex";
+
+        if(navigator.vibrate){
+            navigator.vibrate([300,100,300]);
+        }
+
+    },4200);
+
+    // ===== 本当の役職 =====
+
+    setTimeout(()=>{
+
+        document.body.classList.remove("shake");
+
+        document.getElementById("errorScreen").style.display="none";
+
+        document.getElementById("trueRole").style.display="flex";
+
+        document.getElementById("flash").animate([
+            {opacity:0},
+            {opacity:1},
+            {opacity:0}
+        ],{
+            duration:900
+        });
+
+        if(navigator.vibrate){
+            navigator.vibrate([500,120,500]);
+        }
+
+    },7000);
+
+};
+
+</script>
+</body>
+</html>
