@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人狼 ROLE CARD</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Yu Gothic",sans-serif;
+}
+
+body{
+background:radial-gradient(circle at center,#1b2745,#090a0f,#000);
+overflow:hidden;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:0;
+}
+
+.container{
+position:relative;
+z-index:2;
+text-align:center;
+}
+
+h1{
+color:white;
+font-size:42px;
+letter-spacing:6px;
+margin-bottom:40px;
+text-shadow:0 0 20px cyan;
+}
+
+button{
+
+padding:20px 55px;
+
+font-size:24px;
+
+font-weight:bold;
+
+color:white;
+
+cursor:pointer;
+
+border:none;
+
+border-radius:50px;
+
+background:linear-gradient(45deg,#00b4ff,#0077ff);
+
+box-shadow:
+0 0 25px cyan,
+0 0 60px cyan;
+
+transition:.3s;
+
+}
+
+button:hover{
+
+transform:scale(1.08);
+
+box-shadow:
+0 0 40px cyan,
+0 0 120px cyan;
+
+}
+
+.flash{
+
+position:fixed;
+
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+background:white;
+
+opacity:0;
+
+pointer-events:none;
+
+z-index:5;
+
+}
+
+.card{
+
+display:none;
+
+margin-top:40px;
+
+animation:openCard 1.2s forwards;
+
+}
+
+.card img{
+
+width:340px;
+
+border-radius:18px;
+
+border:4px solid gold;
+
+box-shadow:
+
+0 0 30px gold,
+0 0 80px gold,
+0 0 150px gold;
+
+}
+
+.role{
+
+margin-top:25px;
+
+font-size:36px;
+
+font-weight:bold;
+
+color:white;
+
+letter-spacing:3px;
+
+text-shadow:
+0 0 15px gold,
+0 0 40px gold;
+
+animation:fadeIn 1.5s;
+
+}
+
+@keyframes fadeIn{
+
+from{
+
+opacity:0;
+
+transform:translateY(30px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+}
+
+@keyframes openCard{
+
+0%{
+
+opacity:0;
+
+transform:
+
+scale(.1)
+rotateY(180deg);
+
+}
+
+60%{
+
+transform:
+
+scale(1.15)
+rotateY(0deg);
+
+}
+
+100%{
+
+opacity:1;
+
+transform:scale(1);
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="flash" id="flash"></div>
+
+<div class="container">
+
+<h1>ROLE CARD</h1>
+
+<button onclick="openCard()">
+
+役職を受け取る
+
+</button>
+
+<div class="card" id="card">
+
+<img src="IMG_3580.jpg">
+
+<div class="role">
+
+独裁者
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const canvas=document.getElementById("bg");
+const ctx=canvas.getContext("2d");
+
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+
+let stars=[];
+
+for(let i=0;i<220;i++){
+
+stars.push({
+
+x:Math.random()*canvas.width,
+
+y:Math.random()*canvas.height,
+
+r:Math.random()*2+1,
+
+v:Math.random()*2+0.5
+
+});
+
+}
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle="white";
+
+stars.forEach(s=>{
+
+ctx.beginPath();
+
+ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+
+ctx.fill();
+
+s.y-=s.v;
+
+if(s.y<0){
+
+s.y=canvas.height;
+
+s.x=Math.random()*canvas.width;
+
+}
+
+});
+
+requestAnimationFrame(draw);
+
+}
+
+draw();
+
+function openCard(){
+
+document.querySelector("button").style.display="none";
+
+const flash=document.getElementById("flash");
+
+flash.animate([
+
+{opacity:0},
+
+{opacity:1},
+
+{opacity:0}
+
+],{
+
+duration:450
+
+});
+
+if(navigator.vibrate){
+
+navigator.vibrate([100,50,100]);
+
+}
+
+setTimeout(()=>{
+
+document.getElementById("card").style.display="block";
+
+},500);
+
+}
+
+</script>
+
+</body>
+</html>
